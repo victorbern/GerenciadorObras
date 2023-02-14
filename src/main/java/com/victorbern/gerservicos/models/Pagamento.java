@@ -1,5 +1,6 @@
 package com.victorbern.gerservicos.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -23,7 +24,7 @@ public class Pagamento {
 	private String tipoPagamento;
 	
 	@OneToMany(mappedBy = "pagamento")
-	private List<OrdemServico> ordens;
+	private List<Obra> obras = new ArrayList<>();
 	
 	public Pagamento() {
 		
@@ -54,24 +55,24 @@ public class Pagamento {
 		this.tipoPagamento = tipoPagamento;
 	}
 
-	public List<OrdemServico> getOrdens() {
-		return ordens;
+	public List<Obra> getObras() {
+		return obras;
 	}
 
-	public void setOrdens(List<OrdemServico> ordens) {
-		this.ordens = ordens;
+	public void setObras(List<Obra> obras) {
+		this.obras = obras;
 	}
 	
-	public void addOrdem(OrdemServico ordem) {
-		if(ordem.getPagamento() != this) {
-			ordem.setPagamento(this);
+	public void addObra(Obra obra) {
+		if(obra.getPagamento() != this) {
+			obra.setPagamento(this);
 		}
-		this.ordens.add(ordem);
+		this.obras.add(obra);
 	}
 	
-	public void removeOrdem(OrdemServico ordem) {
-		ordem.setPagamento(null);
-		this.ordens.remove(ordem);
+	public void removeObra(Obra obra) {
+		obra.setPagamento(null);
+		this.obras.remove(obra);
 	}
 	
 }

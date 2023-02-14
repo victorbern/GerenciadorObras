@@ -1,5 +1,6 @@
 package com.victorbern.gerservicos.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -14,7 +15,7 @@ public class Endereco {
 	@GeneratedValue
 	@Id
 	@Column(name = "endereco_id")
-	private Long idEndereco;
+	private Long id;
 	
 	@Column(name = "logradouro")
 	private String logradouro;
@@ -35,7 +36,7 @@ public class Endereco {
 	private String tipoEndereco;
 	
 	@OneToMany(mappedBy = "endereco")
-	private List<OrdemServico> ordens;
+	private List<Obra> obras = new ArrayList<>();
 	
 	public Endereco() {
 		
@@ -51,8 +52,8 @@ public class Endereco {
 		this.tipoEndereco = tipoEndereco;
 	}
 
-	public Long getIdEndereco() {
-		return idEndereco;
+	public Long getId() {
+		return id;
 	}
 
 	public String getLogradouro() {
@@ -103,12 +104,24 @@ public class Endereco {
 		this.tipoEndereco = tipoEndereco;
 	}
 
-	public List<OrdemServico> getOrdens() {
-		return ordens;
+	public List<Obra> getObras() {
+		return obras;
 	}
 
-	public void setOrdens(List<OrdemServico> ordens) {
-		this.ordens = ordens;
+	public void setObras(List<Obra> obras) {
+		this.obras = obras;
+	}
+	
+	public void addObra(Obra obra) {
+		if(obra.getEndereco() != this) {
+			obra.setEndereco(this);
+		}
+		this.obras.add(obra);
+	}
+	
+	public void removeObra(Obra obra) {
+		obra.setEndereco(null);
+		this.obras.remove(obra);
 	}
 
 }

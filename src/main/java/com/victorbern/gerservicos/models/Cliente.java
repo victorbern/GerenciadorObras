@@ -27,7 +27,7 @@ public class Cliente {
 	private String emailCliente;
 	
 	@OneToMany(mappedBy = "cliente")
-	private List<OrdemServico> ordens = new ArrayList<>();
+	private List<Obra> obras = new ArrayList<>();
 
 	public Cliente() {
 		
@@ -41,6 +41,10 @@ public class Cliente {
 
 	public Long getId() {
 		return this.id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getNomeCliente() {
@@ -67,24 +71,24 @@ public class Cliente {
 		this.emailCliente = emailCliente;
 	}
 	
-	public List<OrdemServico> getOrdens() {
-		return ordens;
+	public List<Obra> getObras() {
+		return obras;
 	}
 
-	public void setOrdens(List<OrdemServico> ordens) {
-		this.ordens = ordens;
+	public void setObras(List<Obra> obras) {
+		this.obras = obras;
 	}
 	
-	public void addOrdem(OrdemServico ordem) {
-		if(ordem.getCliente() != this) {
-			ordem.setCliente(this);
+	public void addObra(Obra obra) {
+		if(obra.getCliente() != this) {
+			obra.setCliente(this);
 		}
-		this.ordens.add(ordem);
+		this.obras.add(obra);
 	}
 	
-	public void removeOrdem(OrdemServico ordem) {
-		ordem.setCliente(null);
-		this.ordens.remove(ordem);
+	public void removeOrdem(Obra obra) {
+		obra.setCliente(null);
+		this.obras.remove(obra);
 	}
 	
 }

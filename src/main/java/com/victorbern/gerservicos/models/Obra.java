@@ -1,6 +1,8 @@
 package com.victorbern.gerservicos.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,16 +10,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
-public class OrdemServico {
+public class Obra {
 	
 	@GeneratedValue
 	@Id
+	@Column(name = "obra_id")
 	private Long id;
 	
-	@Column(name = "totalOrdemServico")
-	private float totalOrdemServico;
+	@Column(name = "totalObra")
+	private float totalObra;
 	
 	@Column(name = "dataInicio")
 	private Date dataInicio;
@@ -34,22 +38,20 @@ public class OrdemServico {
 	@JoinColumn(name = "endereco_id")
 	private Endereco endereco;
 	
-	@ManyToOne
-	@JoinColumn(name = "servico_id")
-	private Servico servico;
+	@OneToMany(mappedBy = "obra")
+	private List<Comodo> comodos = new ArrayList<>();
 	
-	public OrdemServico() {
+	public Obra() {
 		
 	}
 
-	public OrdemServico(float totalOrdemServico, Date dataInicio, Cliente cliente, Pagamento pagamento,
-			Endereco endereco, Servico servico) {
-		this.totalOrdemServico = totalOrdemServico;
+	public Obra(float totalObra, Date dataInicio, Cliente cliente, Pagamento pagamento,
+			Endereco endereco) {
+		this.totalObra = totalObra;
 		this.dataInicio = dataInicio;
 		this.cliente = cliente;
 		this.pagamento = pagamento;
 		this.endereco = endereco;
-		this.servico = servico;
 	}
 
 	public Long getId() {
@@ -60,12 +62,12 @@ public class OrdemServico {
 		this.id = id;
 	}
 
-	public float getTotalOrdemServico() {
-		return totalOrdemServico;
+	public float getTotalObra() {
+		return totalObra;
 	}
 
-	public void setTotalOrdemServico(float totalOrdemServico) {
-		this.totalOrdemServico = totalOrdemServico;
+	public void setTotalObra(float totalObra) {
+		this.totalObra = totalObra;
 	}
 
 	public Date getDataInicio() {
@@ -100,12 +102,24 @@ public class OrdemServico {
 		this.endereco = endereco;
 	}
 
-	public Servico getServico() {
-		return servico;
+	public List<Comodo> getComodos() {
+		return comodos;
 	}
 
-	public void setServico(Servico servico) {
-		this.servico = servico;
+	public void setComodos(List<Comodo> comodos) {
+		this.comodos = comodos;
+	}
+	
+	public void addComodo(Comodo comodo) {
+		if(comodo.getObra() != this) {
+			comodo.setObra(this);
+		}
+		this.comodos.add(comodo);
+	}
+	
+	public void removeComodo(Comodo comodo) {
+		comodo.setObra(null);
+		this.comodos.remove(comodo);
 	}
 	
 }

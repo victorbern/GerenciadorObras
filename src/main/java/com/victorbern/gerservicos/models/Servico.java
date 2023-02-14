@@ -6,7 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Servico {
@@ -14,7 +15,7 @@ public class Servico {
 	@GeneratedValue
 	@Id
 	@Column(name = "servico_id")
-	private Long idServico;
+	private Long id;
 	
 	@Column(name = "descricaoServico")
 	private String descricaoServico;
@@ -25,27 +26,23 @@ public class Servico {
 	@Column(name = "totalMetragem")
 	private float totalMetragem;
 	
-	@Column(name = "localServico")
-	private String localServico;
-	
-	@OneToMany(mappedBy = "servico")
-	private List<OrdemServico> ordens;
+	@ManyToOne
+	@JoinColumn(name = "comodo_id")
+	private Comodo comodo;
 
 	public Servico() {
 
 	}
 
-	public Servico(String descricaoServico, float valorMetro, float totalMetragem, String localServico,
-			List<OrdemServico> ordens) {
+	public Servico(String descricaoServico, float valorMetro, float totalMetragem,
+			List<Obra> ordens) {
 		this.descricaoServico = descricaoServico;
 		this.valorMetro = valorMetro;
 		this.totalMetragem = totalMetragem;
-		this.localServico = localServico;
-		this.ordens = ordens;
 	}
 
-	public Long getIdServico() {
-		return idServico;
+	public Long getId() {
+		return id;
 	}
 
 	public String getDescricaoServico() {
@@ -71,33 +68,13 @@ public class Servico {
 	public void setTotalMetragem(float totalMetragem) {
 		this.totalMetragem = totalMetragem;
 	}
-
-	public String getLocalServico() {
-		return localServico;
-	}
-
-	public void setLocalServico(String localServico) {
-		this.localServico = localServico;
-	}
-
-	public List<OrdemServico> getOrdens() {
-		return ordens;
-	}
-
-	public void setOrdens(List<OrdemServico> ordens) {
-		this.ordens = ordens;
-	}
 	
-	public void addOrdem(OrdemServico ordem) {
-		if(ordem.getServico() != this) {
-			ordem.setServico(this);
-		}
-		this.ordens.add(ordem);
+	public Comodo getComodo() {
+		return comodo;
 	}
-	
-	public void removeOrdem(OrdemServico ordem) {
-		ordem.setServico(null);
-		this.ordens.remove(ordem);
+
+	public void setComodo(Comodo comodo) {
+		this.comodo = comodo;
 	}
 	
 }
