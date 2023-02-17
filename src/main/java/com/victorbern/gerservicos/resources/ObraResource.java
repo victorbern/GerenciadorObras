@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,4 +67,31 @@ public class ObraResource {
 			return new ResponseEntity<Optional<ObraDTO>>(HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	@DeleteMapping(path="/{id}")
+	@Transactional
+	public ResponseEntity<Optional<ObraDTO>> deleteById(@PathVariable Long id){
+		try {
+			obraRepository.deleteById(id);
+			return new ResponseEntity<Optional<ObraDTO>>(HttpStatus.OK);
+		} catch(NoSuchElementException nsee) {
+			return new ResponseEntity<Optional<ObraDTO>>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@PutMapping(value = "/{id}")
+	@Transactional
+	public ResponseEntity<ObraDTO> update(@PathVariable Long id, @RequestBody Obra novaObra){
+		return obraRepository.findById(id).map(obra -> {
+			obra.setTotalObra(novaObra.getTotalObra());
+			obra.setDataInicio(novaObra.getDataInicio());
+			obra.setCliente(novaObra.getCliente());
+			obra.setPagamento(novaObra.getPagamento());
+			obra.setEndereco(novaObra.getEndereco());
+			Obra obraAtualizada = obraRepository.save(obra);
+			ObraDTO obraDTO = new ObraDTO(obraAtualizada);
+			return ResponseEntity.ok().body(obraDTO);
+		}).orElse(ResponseEntity.notFound().build());
+	}
+	
 }
