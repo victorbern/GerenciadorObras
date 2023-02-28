@@ -19,7 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.victorbern.gerservicos.dto.ObraDTO;
+import com.victorbern.gerservicos.exception.ResourceException;
+import com.victorbern.gerservicos.models.Cliente;
+import com.victorbern.gerservicos.models.Endereco;
 import com.victorbern.gerservicos.models.Obra;
+import com.victorbern.gerservicos.repositories.ClienteRepository;
+import com.victorbern.gerservicos.repositories.EnderecoRepository;
 import com.victorbern.gerservicos.repositories.ObraRepository;
 
 @RestController
@@ -28,6 +33,12 @@ public class ObraResource {
 	
 	@Autowired
 	private ObraRepository obraRepository;
+	
+	@Autowired
+	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private EnderecoRepository enderecoRepository;
 	
 	public ObraResource(ObraRepository obraRepository) {
 		this.obraRepository = obraRepository;	
@@ -92,6 +103,55 @@ public class ObraResource {
 			ObraDTO obraDTO = new ObraDTO(obraAtualizada);
 			return ResponseEntity.ok().body(obraDTO);
 		}).orElse(ResponseEntity.notFound().build());
+	}
+	
+	// Buscar obra com base no cliente
+	@GetMapping(path="cliente/{id}")
+	@Transactional
+	public ResponseEntity<List<ObraDTO>> findByCliente(@PathVariable Long id){
+		Optional<Cliente> cliente;
+		List<Obra> obras = new ArrayList<>();
+		List<ObraDTO> obrasDTO = new ArrayList<>();
+		try {
+			cliente = clienteRepository.findById(id);
+			if (!cliente.isPresent()) {
+				throw new ResourceException(HttpStatus.NOT_FOUND, "Cliente não encontrado!");
+			}
+			obras = obraRepository.findByClienteId(cliente.get().getId());
+			for (Obra obra : obras) {
+				obrasDTO.add(new ObraDTO(obra));
+			}
+			
+			return new ResponseEntity<List<ObraDTO>>(obrasDTO, HttpStatus.OK);
+		} catch(ResourceException re) {
+			return new ResponseEntity<List<ObraDTO>>(re.getHttpStatus());
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+	
+	// Buscar obra com base no endereço
+	@GetMapping(path="endereco/{id}")
+	@Transactional
+	public ResponseEntity<List<ObraDTO>> findByEndereco(@PathVariable Long id){
+		Optional<Endereco> endereco;
+		List<Obra> obras = new ArrayList<>();
+		List<ObraDTO> obrasDTO = new ArrayList<>();
+		try {
+			endereco = enderecoRepository.findById(id);
+			if (!endereco.isPresent()) {
+				throw new ResourceException(HttpStatus.NOT_FOUND, "Endereço não encontrado");
+			}
+			obras = obraRepository.findByEnderecoId(endereco.get().getId());
+			for (Obra obra : obras) {
+				obrasDTO.add(new ObraDTO(obra));
+			}
+			return new ResponseEntity<List<ObraDTO>>(obrasDTO, HttpStatus.OK);
+		} catch (ResourceException re) {
+			return new ResponseEntity<List<ObraDTO>>(re.getHttpStatus());
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().build();
+		}
 	}
 	
 }
