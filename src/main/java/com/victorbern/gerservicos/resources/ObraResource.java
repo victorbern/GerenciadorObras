@@ -23,9 +23,11 @@ import com.victorbern.gerservicos.exception.ResourceException;
 import com.victorbern.gerservicos.models.Cliente;
 import com.victorbern.gerservicos.models.Endereco;
 import com.victorbern.gerservicos.models.Obra;
+import com.victorbern.gerservicos.models.Pagamento;
 import com.victorbern.gerservicos.repositories.ClienteRepository;
 import com.victorbern.gerservicos.repositories.EnderecoRepository;
 import com.victorbern.gerservicos.repositories.ObraRepository;
+import com.victorbern.gerservicos.repositories.PagamentoRepository;
 
 @RestController
 @RequestMapping(path = "/obras")
@@ -39,6 +41,9 @@ public class ObraResource {
 	
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
 	
 	public ObraResource(ObraRepository obraRepository) {
 		this.obraRepository = obraRepository;	
@@ -105,7 +110,7 @@ public class ObraResource {
 		}).orElse(ResponseEntity.notFound().build());
 	}
 	
-	// Buscar obra com base no cliente
+	// Buscar obras com base no cliente
 	@GetMapping(path="cliente/{id}")
 	@Transactional
 	public ResponseEntity<List<ObraDTO>> findByCliente(@PathVariable Long id){
@@ -130,7 +135,7 @@ public class ObraResource {
 		}
 	}
 	
-	// Buscar obra com base no endereço
+	// Buscar obras com base no endereço
 	@GetMapping(path="endereco/{id}")
 	@Transactional
 	public ResponseEntity<List<ObraDTO>> findByEndereco(@PathVariable Long id){
@@ -143,6 +148,30 @@ public class ObraResource {
 				throw new ResourceException(HttpStatus.NOT_FOUND, "Endereço não encontrado");
 			}
 			obras = obraRepository.findByEnderecoId(endereco.get().getId());
+			for (Obra obra : obras) {
+				obrasDTO.add(new ObraDTO(obra));
+			}
+			return new ResponseEntity<List<ObraDTO>>(obrasDTO, HttpStatus.OK);
+		} catch (ResourceException re) {
+			return new ResponseEntity<List<ObraDTO>>(re.getHttpStatus());
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+	
+	// Buscar obras com base no pagamento
+	@GetMapping(path="pagamento/{id}")
+	@Transactional
+	public ResponseEntity<List<ObraDTO>> findByPagamento(@PathVariable Long id){
+		Optional<Pagamento> pagamento;
+		List<Obra> obras = new ArrayList<>();
+		List<ObraDTO> obrasDTO = new ArrayList<>();
+		try {
+			pagamento = pagamentoRepository.findById(id);
+			if (!pagamento.isPresent()) {
+				throw new ResourceException(HttpStatus.NOT_FOUND, "Pagamento não encontrado");
+			}
+			obras = obraRepository.findByPagamentoId(pagamento.get().getId());
 			for (Obra obra : obras) {
 				obrasDTO.add(new ObraDTO(obra));
 			}

@@ -12,5 +12,6 @@ public interface ObraRepository extends JpaRepository<Obra, Long>{
 	
 	List<Obra> findByClienteId(Long id);
 	List<Obra> findByEnderecoId(Long id);
+	List<Obra> findByPagamentoId(Long id);
 	
 }
